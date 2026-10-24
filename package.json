@@ -1,0 +1,12 @@
+{
+  "name": "job-review-board",
+  "version": "1.0.0",
+  "description": "A static, dependency-free board to review scored job offers and approve them by hand before applying.",
+  "license": "MIT",
+  "author": "Sergio Atanacio",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "export": "node scripts/export_approved.mjs"
+  }
+}

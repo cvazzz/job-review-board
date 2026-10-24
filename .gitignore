@@ -1,0 +1,7 @@
+data/jobs.local.json
+decisions*.json
+approved_queue.json
+node_modules/
+.env
+.env.*
+*.local.csv
