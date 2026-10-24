@@ -5,7 +5,7 @@
   var STORE_KEY = 'jrb.decisions.v1';
   var LABEL = { pending: 'To review', approved: 'Approved', hold: 'On hold', discarded: 'Discarded' };
   var PRIO = { alta: 'High', media: 'Medium', baja: 'Low' };
-  var state = { jobs: [], decisions: load(), status: 'pending', prio: 'todas', soloSalario: false, open: null, confirm: null, ready: false, error: '', source: '' };
+  var state = { jobs: [], decisions: load(), status: 'pending', prio: 'todas', soloSalario: false, maxDias: 0, orden: 'score', open: null, confirm: null, ready: false, error: '', source: '' };
 
   function load() {
     try { return L.parseDecisions(JSON.parse(localStorage.getItem(STORE_KEY))) || {}; } catch (e) { return {}; }
@@ -32,7 +32,7 @@
   }
   function $(id) { return document.getElementById(id); }
   function say(t) { $('msg').textContent = t; }
-  function cvFile(j) { return j.cv_variant ? 'CV_' + j.cv_variant + '.pdf' : 'to be defined'; }
+  function cvFile(j) { return j.cv_file ? j.cv_file.split('/').pop() : (j.cv_variant ? 'CV_' + j.cv_variant + '.pdf' : 'to be defined'); }
   function chip(label, pressed, onclick) {
     return h('button', { type: 'button', 'aria-pressed': String(!!pressed), onclick: onclick }, label);
   }
@@ -50,6 +50,14 @@
     });
     var s = $('f-sal'); s.replaceChildren(h('span', { class: 'lbl' }, 'Salary'));
     s.append(chip('Published salary above the floor only', state.soloSalario, function () { state.soloSalario = !state.soloSalario; render(); }));
+    var g = $('f-age'); g.replaceChildren(h('span', { class: 'lbl' }, 'Age'));
+    [[0, 'Any'], [14, 'Up to 14 days'], [30, 'Up to 30 days'], [60, 'Up to 60 days']].forEach(function (a) {
+      g.append(chip(a[1], state.maxDias === a[0], function () { state.maxDias = a[0]; render(); }));
+    });
+    var o = $('f-sort'); o.replaceChildren(h('span', { class: 'lbl' }, 'Sort'));
+    [['score', 'Best score'], ['recent', 'Newest first']].forEach(function (a) {
+      o.append(chip(a[1], state.orden === a[0], function () { state.orden = a[0]; render(); }));
+    });
     $('counts').replaceChildren(
       h('b', {}, String(state.jobs.length)), ' offers, ',
       h('b', {}, String(c.pending)), ' to review, ',
@@ -63,6 +71,11 @@
     if (j.cumple_piso && j.salario_publicado) return h('span', { class: 'pill ok' }, 'Salary ' + j.salario_publicado + (j.moneda ? ' ' + j.moneda : ''));
     if (j.cumple_piso) return h('span', { class: 'pill ok' }, 'Salary above floor');
     return h('span', { class: 'pill warn' }, j.salario_publicado ? 'Salary below floor' : 'Salary not published');
+  }
+  function agePill(j) {
+    var band = L.ageBand(j.antiguedad_dias);
+    var cls = band === 'fresh' ? 'ok' : band === 'aging' ? 'warn' : band === 'stale' ? 'bad' : 'warn';
+    return h('span', { class: 'pill ' + cls }, 'Posted ' + L.ageText(j.antiguedad_dias));
   }
   function prioPill(j) {
     var cls = j.prioridad === 'alta' ? 'ok' : (j.prioridad === 'media' ? 'warn' : 'bad');
@@ -85,6 +98,9 @@
       h('dt', {}, 'Strengths'), h('dd', {}, j.fortalezas || '-'),
       h('dt', {}, 'Gaps'), h('dd', {}, j.brechas || '-'),
       h('dt', {}, 'Risks'), h('dd', {}, j.riesgos || '-'),
+      h('dt', {}, 'Published'), h('dd', {}, j.fecha_publicacion ? j.fecha_publicacion + ' (' + L.ageText(j.antiguedad_dias) + ')' : 'Date not published by the source' + (j.antiguedad_dias == null ? '. Confirm the offer is still open.' : '')),
+      j.expira ? h('dt', {}, 'Closes') : null, j.expira ? h('dd', {}, j.expira) : null,
+      h('dt', {}, 'Salary vs floor'), h('dd', {}, j.nota_piso || (j.salario_publicado ? j.salario_publicado + ' ' + j.moneda : 'Not published: ask before investing time.')),
       h('dt', {}, 'Eligible where'), h('dd', {}, j.pais_elegible || '-'),
       h('dt', {}, 'Mode'), h('dd', {}, j.modalidad || '-'),
       h('dt', {}, 'Language'), h('dd', {}, j.idioma),
@@ -118,7 +134,7 @@
       h('span', {},
         h('div', { class: 'title' }, j.puesto),
         h('div', { class: 'meta' }, h('span', {}, j.empresa), h('span', {}, j.modalidad), h('span', {}, j.fuente))),
-      h('span', { class: 'state' }, prioPill(j), salaryPill(j), st !== 'pending' ? h('span', { class: 'pill' }, LABEL[st]) : null));
+      h('span', { class: 'state' }, prioPill(j), agePill(j), salaryPill(j), st !== 'pending' ? h('span', { class: 'pill' }, LABEL[st]) : null));
     return h('article', { class: 'job', style: 'animation-delay:' + Math.min(i, 10) * 30 + 'ms' }, head, open ? detail(j) : null);
   }
 
@@ -128,7 +144,7 @@
     if (state.error) { list.replaceChildren(h('div', { class: 'empty' }, state.error)); return; }
     if (!state.ready) { list.replaceChildren(h('div', { class: 'empty' }, 'Loading offers...')); return; }
     if (!state.jobs.length) { list.replaceChildren(h('div', { class: 'empty' }, 'No offers loaded. Use "Load jobs file" to pick a JSON file.')); return; }
-    var rows = L.filterJobs(state.jobs, state.decisions, { status: state.status, prioridad: state.prio, soloSalario: state.soloSalario });
+    var rows = L.filterJobs(state.jobs, state.decisions, { status: state.status, prioridad: state.prio, soloSalario: state.soloSalario, maxDias: state.maxDias, orden: state.orden });
     if (!rows.length) { list.replaceChildren(h('div', { class: 'empty' }, 'No offers match this filter.')); return; }
     list.replaceChildren.apply(list, rows.map(row));
   }

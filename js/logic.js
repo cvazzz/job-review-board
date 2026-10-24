@@ -32,7 +32,40 @@
     return /^(si|sí|yes|true|1|y)$/i.test(str(v));
   }
 
-  /* Returns a safe, uniform job object, or null if it has no id or title. */
+  var DAY = 86400000;
+
+  /* Whole days between a YYYY-MM-DD date and `now` (a Date); null when the date is missing or invalid. */
+  function ageDays(fecha, now) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(str(fecha));
+    if (!m) return null;
+    var t = Date.UTC(+m[1], +m[2] - 1, +m[3]);
+    var n = now || new Date();
+    var today = Date.UTC(n.getFullYear(), n.getMonth(), n.getDate());
+    return isFinite(t) ? Math.max(0, Math.round((today - t) / DAY)) : null;
+  }
+
+  function isoDaysAgo(days, now) {
+    var n = now || new Date();
+    var d = new Date(Date.UTC(n.getFullYear(), n.getMonth(), n.getDate()) - days * DAY);
+    return d.toISOString().slice(0, 10);
+  }
+
+  /* 'fresh' up to 14 days, 'aging' up to 45, 'stale' beyond, 'unknown' without a date. */
+  function ageBand(days) {
+    if (days == null) return 'unknown';
+    return days <= 14 ? 'fresh' : days <= 45 ? 'aging' : 'stale';
+  }
+
+  function ageText(days) {
+    if (days == null) return 'date unknown';
+    if (days === 0) return 'today';
+    if (days === 1) return '1 day ago';
+    if (days < 60) return days + ' days ago';
+    return Math.round(days / 30) + ' months ago';
+  }
+
+  /* Returns a safe, uniform job object, or null if it has no id or title.
+     Accepts both this board's field names and the ones written by the job agent (publicada, salario, pais, metodo, verificacion). */
   function normalizeJob(raw) {
     if (!raw || typeof raw !== 'object') return null;
     var id = str(raw.id), puesto = str(raw.puesto);
@@ -44,30 +77,39 @@
     if (PRIORITIES.indexOf(prio) < 0) prio = 'media';
     var idioma = str(raw.idioma).toUpperCase();
     var usd = Number(raw.salario_mensual_usd_est);
+    var fecha = str(raw.fecha_publicacion) || str(raw.publicada);
+    if (!fecha && isFinite(Number(raw.dias_atras)) && str(raw.dias_atras) !== '') fecha = isoDaysAgo(Number(raw.dias_atras));
+    var sal = str(raw.salario_publicado) || (/^no publicado$/i.test(str(raw.salario)) ? '' : str(raw.salario));
+    var piso = str(raw.cumple_piso).toLowerCase();
+    var days = ageDays(fecha);
     return {
       id: id,
       empresa: str(raw.empresa),
       puesto: puesto,
       url: isHttpsUrl(raw.url) ? str(raw.url) : null,
       fuente: str(raw.fuente),
-      pais_elegible: str(raw.pais_elegible),
+      pais_elegible: str(raw.pais_elegible) || str(raw.pais),
       modalidad: str(raw.modalidad),
       idioma: idioma === 'EN' ? 'EN' : 'ES',
-      fecha_publicacion: str(raw.fecha_publicacion),
-      salario_publicado: str(raw.salario_publicado),
+      fecha_publicacion: fecha,
+      antiguedad_dias: days,
+      expira: str(raw.expira),
+      nota_piso: str(raw.nota_piso),
+      salario_publicado: sal,
       moneda: str(raw.moneda),
       salario_mensual_usd_est: isFinite(usd) && str(raw.salario_mensual_usd_est) !== '' ? usd : null,
-      cumple_piso: truthy(raw.cumple_piso),
+      cumple_piso: truthy(piso) || piso === 'si',
       score: score,
       prioridad: prio,
-      metodo_postulacion: str(raw.metodo_postulacion),
+      metodo_postulacion: str(raw.metodo_postulacion) || str(raw.metodo),
       requiere_humano: truthy(raw.requiere_humano),
-      estado_verificacion: str(raw.estado_verificacion),
+      estado_verificacion: str(raw.estado_verificacion) || str(raw.verificacion),
       fortalezas: str(raw.fortalezas),
       brechas: str(raw.brechas),
       riesgos: str(raw.riesgos),
       notas: str(raw.notas),
-      cv_variant: str(raw.cv_variant) || cvVariantFor(puesto)
+      cv_variant: str(raw.cv_variant) || cvVariantFor(puesto),
+      cv_file: str(raw.cv_file)
     };
   }
 
@@ -101,13 +143,18 @@
     return next;
   }
 
-  function sortJobs(jobs) {
+  /* by: 'score' (default) or 'recent' (newest first, offers without a date last; ties by score). */
+  function sortJobs(jobs, by) {
     return jobs.slice().sort(function (a, b) {
+      if (by === 'recent') {
+        var da = a.antiguedad_dias == null ? 1e9 : a.antiguedad_dias, db = b.antiguedad_dias == null ? 1e9 : b.antiguedad_dias;
+        if (da !== db) return da - db;
+      }
       return (b.score - a.score) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
     });
   }
 
-  /* opts: {status, prioridad ('todas' or a priority), soloSalario} */
+  /* opts: {status, prioridad ('todas' or a priority), soloSalario, maxDias (number of days or 0 for any), orden ('score'|'recent')} */
   function filterJobs(jobs, decisions, opts) {
     opts = opts || {};
     var status = opts.status || 'pending', prio = opts.prioridad || 'todas';
@@ -115,8 +162,9 @@
       if (statusOf(decisions, j.id) !== status) return false;
       if (prio !== 'todas' && j.prioridad !== prio) return false;
       if (opts.soloSalario && !(j.cumple_piso && j.salario_publicado)) return false;
+      if (opts.maxDias > 0 && !(j.antiguedad_dias != null && j.antiguedad_dias <= opts.maxDias)) return false;
       return true;
-    }));
+    }), opts.orden);
   }
 
   function countByStatus(jobs, decisions) {
@@ -146,7 +194,8 @@
         return {
           id: j.id, empresa: j.empresa, puesto: j.puesto, url: j.url,
           metodo_postulacion: j.metodo_postulacion, requiere_humano: j.requiere_humano,
-          cv_variant: j.cv_variant, score: j.score,
+          cv_variant: j.cv_variant, cv_file: j.cv_file, score: j.score,
+          fecha_publicacion: j.fecha_publicacion, antiguedad_dias: j.antiguedad_dias,
           approved_at: decisions[j.id].decided_at
         };
       });
@@ -154,6 +203,7 @@
 
   return {
     STATUSES: STATUSES, PRIORITIES: PRIORITIES, TRANSITIONS: TRANSITIONS,
+    ageDays: ageDays, ageBand: ageBand, ageText: ageText, isoDaysAgo: isoDaysAgo,
     isHttpsUrl: isHttpsUrl, cvVariantFor: cvVariantFor, normalizeJob: normalizeJob,
     normalizeJobs: normalizeJobs, statusOf: statusOf, canTransition: canTransition,
     applyDecision: applyDecision, sortJobs: sortJobs, filterJobs: filterJobs,

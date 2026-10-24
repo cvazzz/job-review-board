@@ -100,3 +100,47 @@ test('app code never assigns data through innerHTML', () => {
     assert.ok(!/innerHTML|outerHTML|insertAdjacentHTML|document\.write/.test(src), f);
   }
 });
+
+test('ageDays counts whole days and rejects bad dates', () => {
+  const now = new Date(2026, 9, 24);
+  assert.equal(L.ageDays('2026-10-24', now), 0);
+  assert.equal(L.ageDays('2026-10-14T08:00:00Z', now), 10);
+  assert.equal(L.ageDays('2026-08-30', now), 55);
+  assert.equal(L.ageDays('', now), null);
+  assert.equal(L.ageDays('soon', now), null);
+  assert.equal(L.ageDays('2027-01-01', now), 0);
+});
+
+test('ageBand and ageText', () => {
+  assert.deepEqual([0, 14, 15, 45, 46, null].map(L.ageBand), ['fresh', 'fresh', 'aging', 'aging', 'stale', 'unknown']);
+  assert.equal(L.ageText(null), 'date unknown');
+  assert.equal(L.ageText(1), '1 day ago');
+  assert.equal(L.ageText(12), '12 days ago');
+  assert.equal(L.ageText(90), '3 months ago');
+});
+
+test('normalizeJob reads the job agent field names', () => {
+  const j = L.normalizeJob({ id: 'x', puesto: 'AI Dev', publicada: L.isoDaysAgo(9), salario: 'no publicado', cumple_piso: 'salario_no_publicado',
+    pais: 'Peru incluido', metodo: 'Enlace', verificacion: 'ok', cv_file: 'out/cv/2026-10-24/CV_A.pdf', url: 'https://a.b/c' });
+  assert.equal(j.antiguedad_dias, 9);
+  assert.equal(j.salario_publicado, '');
+  assert.equal(j.cumple_piso, false);
+  assert.equal(L.normalizeJob({ id: 'y', puesto: 'D', cumple_piso: 'si', salario: '1500/mes' }).cumple_piso, true);
+  assert.equal(j.pais_elegible, 'Peru incluido');
+  assert.equal(j.estado_verificacion, 'ok');
+  assert.equal(L.normalizeJob({ id: 'z', puesto: 'D', dias_atras: 4 }).antiguedad_dias, 4);
+});
+
+test('filterJobs by max age and sorting by recency', () => {
+  const jobs = [
+    { id: 'a', puesto: 'A', dias_atras: 40, score: 90 },
+    { id: 'b', puesto: 'B', dias_atras: 3, score: 60 },
+    { id: 'c', puesto: 'C', score: 99 },
+    { id: 'd', puesto: 'D', dias_atras: 10, score: 70 }
+  ].map((r) => L.normalizeJob(r));
+  const ids = (o) => L.filterJobs(jobs, {}, o).map((j) => j.id);
+  assert.deepEqual(ids({}), ['c', 'a', 'd', 'b']);
+  assert.deepEqual(ids({ maxDias: 14 }), ['d', 'b']);
+  assert.deepEqual(ids({ orden: 'recent' }), ['b', 'd', 'a', 'c']);
+  assert.deepEqual(ids({ maxDias: 60, orden: 'recent' }), ['b', 'd', 'a']);
+});

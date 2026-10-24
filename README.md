@@ -27,6 +27,16 @@ Tests (Node 18+, no packages to install):
 npm test        # or: node --test tests/*.test.js
 ```
 
+## Age of the offer
+
+Each offer shows how long ago it was posted ("Posted 9 days ago": green up to 14 days, amber up to 45, red beyond), the posting date and, when the source gives one, the closing date. You can filter by maximum age (14, 30 or 60 days) and sort by newest first. Offers without a date are flagged and sorted last.
+
+The board reads the job agent's own field names too (`publicada`, `salario`, `pais`, `metodo`, `verificacion`, `cv_file`), so the agent's `data/jobs.json` can be loaded as is. The demo data uses `dias_atras` (days ago) so its dates never go stale.
+
+## Privacy
+
+The hosted page ships fictional demo data only. Real offers are loaded with "Load jobs file" and stay in the browser: nothing is uploaded, and decisions are kept in localStorage.
+
 ## Decisions
 
 Decisions are stored in the browser's `localStorage`. Use "Export decisions.json" to save them and "Import decisions.json" to restore them. Format:

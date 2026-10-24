@@ -21,6 +21,7 @@ S = {
     "bi": ("Dashboards and semantic modeling are a direct match.", "Asked for a certification that is not held.", "Reporting requests may arrive ad hoc."),
     "sw": ("Solid Python and API design background.", "Listing mentions a framework with limited prior use.", "Salary not published; may fall under the floor."),
 }
+AGES = [2, 5, 9, 13, 21, 28, 38, 52, 70, 4, 7]
 out = []
 for i, (e, p, k, s, pr, sal, cur, usd, floor, m, h, lang, pais) in enumerate(rows, 1):
     f, b, r = S[k]
@@ -28,7 +29,7 @@ for i, (e, p, k, s, pr, sal, cur, usd, floor, m, h, lang, pais) in enumerate(row
         "id": f"demo-{i:03d}", "empresa": e, "puesto": p,
         "url": f"https://example.com/jobs/demo-{i:03d}", "fuente": "Example Board",
         "pais_elegible": pais, "modalidad": pais.split(",")[0], "idioma": lang,
-        "fecha_publicacion": f"2026-0{1 + i % 9}-{10 + i:02d}",
+        "dias_atras": AGES[i - 1],  # the board turns this into a date relative to today, so the demo never goes stale
         "salario_publicado": sal, "moneda": cur, "salario_mensual_usd_est": usd,
         "cumple_piso": "si" if floor else "no", "score": s, "prioridad": pr,
         "metodo_postulacion": m, "requiere_humano": h,

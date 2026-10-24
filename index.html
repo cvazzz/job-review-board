@@ -6,7 +6,7 @@
 <title>Job Review Board</title>
 <meta name="description" content="Review scored job offers and approve them by hand before applying. Static, no dependencies, data stays in your browser.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Instrument+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -22,6 +22,8 @@
     <div class="group" id="f-dec" role="group" aria-label="Status"></div>
     <div class="group" id="f-prio" role="group" aria-label="Priority"></div>
     <div class="group" id="f-sal" role="group" aria-label="Salary"></div>
+    <div class="group" id="f-age" role="group" aria-label="Age of the offer"></div>
+    <div class="group" id="f-sort" role="group" aria-label="Sort order"></div>
   </section>
 
   <section class="tools" aria-label="Data">
@@ -36,7 +38,7 @@
 
   <main class="list" id="list" aria-live="polite"></main>
 
-  <p class="note">Salary floor shown here is only a flag computed upstream (the <code>cumple_piso</code> field). Offers without a published salary are marked. Decisions live in this browser's localStorage; export them to keep or process them elsewhere. The bundled demo data is fictional.</p>
+  <p class="note">Age is counted from the posting date given by the source, against today. Offers older than 60 days (90 for company career pages) are dropped upstream; the age filter is for tightening that further. Salary floor shown here is only a flag computed upstream (the <code>cumple_piso</code> field). Offers without a published salary are marked. Decisions live in this browser's localStorage; export them to keep or process them elsewhere. The bundled demo data is fictional.</p>
 </div>
 <script src="js/logic.js"></script>
 <script src="js/app.js"></script>

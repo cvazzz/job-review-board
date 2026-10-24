@@ -1,17 +1,23 @@
 /* One reading column; each offer is a row that expands. No borders: separation is tone and space. */
 :root{
-  --bg:#1c1511; --surface:#251c16; --raised:#2f241b; --hover:#34281e;
-  --fg:#efe3cf; --muted:#b8a78f; --accent:#c9a06a;
-  --ok:#a3b57f; --warn:#d4a95a; --bad:#cc7f68;
-  --serif:"Fraunces",Georgia,"Times New Roman",serif;
-  --sans:"Instrument Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
-  color-scheme:dark;
+  --bg:#E9EDEC; --surface:#DFE5E4; --raised:#D3DBDA; --hover:#C9D2D1;
+  --fg:#101A24; --muted:#46565F; --accent:#1B5B72; --accent-hover:#124457; --on-accent:#F3F6F6;
+  --ok:#2C6A4C; --warn:#6F4707; --bad:#9A382B;
+  --serif:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+  color-scheme:light;
 }
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0F161C; --surface:#151E26; --raised:#1D2933; --hover:#26343F;
+  --fg:#E4EBEF; --muted:#9DAEB9; --accent:#86B9CE; --accent-hover:#A6CEDE; --on-accent:#0F161C;
+  --ok:#86C1A0; --warn:#D7A862; --bad:#DF9082; color-scheme:dark;
+}}
 *{box-sizing:border-box}
 html{background:var(--bg)}
 body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 var(--sans);padding-block:40px 80px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .wrap{max-width:960px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
-h1{font:400 34px/1.15 var(--serif);margin:0;text-wrap:balance}
+h1{font:500 34px/1.15 var(--serif);margin:0;text-wrap:balance}
 .sub{color:var(--muted);margin:6px 0 0;max-width:62ch}
 .counts{color:var(--muted);font-variant-numeric:tabular-nums;margin:14px 0 0}
 .counts b{color:var(--fg);font-weight:500}
@@ -32,22 +38,22 @@ button:disabled{opacity:.5;cursor:default}
 .head:hover{background:var(--hover)}
 .head:focus-visible{background:var(--hover);text-decoration:none}
 .head:focus-visible .title{color:var(--accent);text-decoration:underline;text-underline-offset:4px}
-.score{font:400 30px/1 var(--serif);color:var(--accent);font-variant-numeric:tabular-nums}
+.score{font:500 28px/1 var(--mono);color:var(--accent);font-variant-numeric:tabular-nums}
 .title{font-weight:500}
 .meta{color:var(--muted);font-size:13px;margin-top:2px;display:flex;flex-wrap:wrap;gap:4px 14px}
-.pill{font-size:12px;padding:3px 9px;border-radius:99px;background:var(--raised);color:var(--muted);white-space:nowrap}
+.pill{font-family:var(--mono);font-size:11.5px;padding:3px 9px;border-radius:99px;background:var(--raised);color:var(--muted);white-space:nowrap}
 .pill.ok{color:var(--ok)}.pill.warn{color:var(--warn)}.pill.bad{color:var(--bad)}
 .state{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
 .detail{padding:4px 18px 20px 90px;display:grid;gap:16px;animation:rise .35s ease both}
 .detail dl{margin:0;display:grid;grid-template-columns:150px 1fr;gap:10px 18px}
-.detail dt{color:var(--muted);font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding-top:3px}
+.detail dt{color:var(--muted);font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding-top:3px}
 .detail dd{margin:0;min-width:0;overflow-wrap:anywhere}
 a{color:var(--accent);text-underline-offset:3px}
 a:focus-visible{outline:none;background:var(--raised);text-decoration:underline}
 .actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.actions .go{background:var(--accent);color:#1c1511;font-weight:600}
-.actions .go:hover{background:#d8b07c}
-.actions .go:focus-visible{background:#d8b07c;color:#1c1511}
+.actions .go{background:var(--accent);color:var(--on-accent);font-weight:600}
+.actions .go:hover{background:var(--accent-hover)}
+.actions .go:focus-visible{background:var(--accent-hover);color:var(--on-accent)}
 .confirm{background:var(--raised);padding:12px 14px;border-radius:8px;display:grid;gap:10px;max-width:62ch}
 .empty{background:var(--surface);border-radius:8px;padding:28px 22px;color:var(--muted)}
 .note{color:var(--muted);font-size:13px;max-width:70ch}
