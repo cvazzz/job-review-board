@@ -35,7 +35,7 @@ The board reads the job agent's own field names too (`publicada`, `salario`, `pa
 
 ## Privacy
 
-The hosted page ships fictional demo data only. Real offers are loaded with "Load jobs file" and stay in the browser: nothing is uploaded, and decisions are kept in localStorage.
+The hosted page shows real, public job listings (company, title, link, salary, age, score) exported by the job agent without anything about the person: no CV files, no strengths or gaps, no decisions. Data order: `data/jobs.local.json` (private, gitignored), then `data/jobs.json` (the public export), then the fictional demo. "Load jobs file" reads a file in the browser only; nothing is uploaded, and decisions are kept in localStorage.
 
 ## Decisions
 

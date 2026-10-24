@@ -95,8 +95,8 @@
   function detail(j) {
     var link = j.url;
     var dl = h('dl', {},
-      h('dt', {}, 'Strengths'), h('dd', {}, j.fortalezas || '-'),
-      h('dt', {}, 'Gaps'), h('dd', {}, j.brechas || '-'),
+      j.fortalezas ? h('dt', {}, 'Strengths') : null, j.fortalezas ? h('dd', {}, j.fortalezas) : null,
+      j.brechas ? h('dt', {}, 'Gaps') : null, j.brechas ? h('dd', {}, j.brechas) : null,
       h('dt', {}, 'Risks'), h('dd', {}, j.riesgos || '-'),
       h('dt', {}, 'Published'), h('dd', {}, j.fecha_publicacion ? j.fecha_publicacion + ' (' + L.ageText(j.antiguedad_dias) + ')' : 'Date not published by the source' + (j.antiguedad_dias == null ? '. Confirm the offer is still open.' : '')),
       j.expira ? h('dt', {}, 'Closes') : null, j.expira ? h('dd', {}, j.expira) : null,
@@ -105,7 +105,7 @@
       h('dt', {}, 'Mode'), h('dd', {}, j.modalidad || '-'),
       h('dt', {}, 'Language'), h('dd', {}, j.idioma),
       h('dt', {}, 'How to apply'), h('dd', {}, (j.metodo_postulacion || '-') + (j.requiere_humano ? '. Needs you for the last step.' : '')),
-      h('dt', {}, 'CV to send'), h('dd', {}, cvFile(j)),
+      j.cv_file || j.cv_variant ? h('dt', {}, 'CV to send') : null, j.cv_file || j.cv_variant ? h('dd', {}, cvFile(j)) : null,
       h('dt', {}, 'Verification'), h('dd', {}, j.estado_verificacion || '-'),
       h('dt', {}, 'Notes'), h('dd', {}, j.notas || '-'),
       h('dt', {}, 'Original post'), h('dd', {}, link ? h('a', { href: link, target: '_blank', rel: 'noopener noreferrer' }, 'Open on the original site') : 'No valid https link')
@@ -201,6 +201,10 @@
   /* data/jobs.local.json wins if present (it is gitignored); a missing file is ignored silently. */
   fetchJson('data/jobs.local.json').then(function (d) {
     if (!setJobs(d, 'data/jobs.local.json')) throw new Error('empty');
+  }).catch(function () {
+    return fetchJson('data/jobs.json').then(function (d) {
+      if (!setJobs(d, 'real offers' + (d && d.generated ? ', collected on ' + d.generated : ''))) throw new Error('empty');
+    });
   }).catch(function () {
     return fetchJson('data/jobs.demo.json').then(function (d) { setJobs(d, 'data/jobs.demo.json (fictional demo data)'); });
   }).catch(function () {
