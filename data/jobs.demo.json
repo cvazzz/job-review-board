@@ -2,7 +2,7 @@
   {
     "id": "demo-001",
     "empresa": "Acme Example",
-    "puesto": "Senior AI Automation Engineer",
+    "puesto": "Junior AI Automation Engineer",
     "url": "https://example.com/jobs/demo-001",
     "fuente": "Example Board",
     "pais_elegible": "Remote, LATAM",
@@ -26,7 +26,7 @@
   {
     "id": "demo-002",
     "empresa": "Globex Sample Co",
-    "puesto": "Data Analyst",
+    "puesto": "Data Analyst (Entry level)",
     "url": "https://example.com/jobs/demo-002",
     "fuente": "Example Board",
     "pais_elegible": "Remote, worldwide",
@@ -50,7 +50,7 @@
   {
     "id": "demo-003",
     "empresa": "Initech Demo",
-    "puesto": "Backend Developer (Python)",
+    "puesto": "Backend Developer (Python), Junior",
     "url": "https://example.com/jobs/demo-003",
     "fuente": "Example Board",
     "pais_elegible": "Remote, LATAM",
@@ -74,7 +74,7 @@
   {
     "id": "demo-004",
     "empresa": "Umbrella Placeholder",
-    "puesto": "BI Developer",
+    "puesto": "Junior BI Developer",
     "url": "https://example.com/jobs/demo-004",
     "fuente": "Example Board",
     "pais_elegible": "Remote, Americas",
@@ -98,7 +98,7 @@
   {
     "id": "demo-005",
     "empresa": "Hooli Fictional",
-    "puesto": "LLM Agent Developer",
+    "puesto": "Junior LLM Agent Developer",
     "url": "https://example.com/jobs/demo-005",
     "fuente": "Example Board",
     "pais_elegible": "Remote, worldwide",
@@ -122,7 +122,7 @@
   {
     "id": "demo-006",
     "empresa": "Stark Imaginary Ltd",
-    "puesto": "Data Engineer",
+    "puesto": "Junior Data Engineer",
     "url": "https://example.com/jobs/demo-006",
     "fuente": "Example Board",
     "pais_elegible": "Remote, EMEA and LATAM",
@@ -146,7 +146,7 @@
   {
     "id": "demo-007",
     "empresa": "Wayne Mockup Inc",
-    "puesto": "Full Stack Developer",
+    "puesto": "Junior Full Stack Developer",
     "url": "https://example.com/jobs/demo-007",
     "fuente": "Example Board",
     "pais_elegible": "Remote, LATAM",
@@ -218,7 +218,7 @@
   {
     "id": "demo-010",
     "empresa": "Vandelay Example Group",
-    "puesto": "Analytics Engineer",
+    "puesto": "Junior Analytics Engineer",
     "url": "https://example.com/jobs/demo-010",
     "fuente": "Example Board",
     "pais_elegible": "Remote, Americas",
@@ -242,7 +242,7 @@
   {
     "id": "demo-011",
     "empresa": "Pied Piper Sample",
-    "puesto": "Workflow Automation Developer",
+    "puesto": "Prompt and Workflow Automation Developer (Jr.)",
     "url": "https://example.com/jobs/demo-011",
     "fuente": "Example Board",
     "pais_elegible": "Remote, LATAM",

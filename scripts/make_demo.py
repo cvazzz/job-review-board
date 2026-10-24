@@ -3,17 +3,17 @@ import json
 from pathlib import Path
 
 rows = [
-    ("Acme Example", "Senior AI Automation Engineer", "agent", 92, "alta", "1800-2400", "USD", 2100, True, "Email with CV attached", "no", "EN", "Remote, LATAM"),
-    ("Globex Sample Co", "Data Analyst", "data", 88, "alta", "1500", "USD", 1500, True, "Company careers form", "si", "EN", "Remote, worldwide"),
-    ("Initech Demo", "Backend Developer (Python)", "sw", 84, "alta", "", "", None, False, "Company careers form", "si", "EN", "Remote, LATAM"),
-    ("Umbrella Placeholder", "BI Developer", "bi", 81, "media", "1300-1600", "USD", 1450, True, "Email with CV attached", "no", "ES", "Remote, Americas"),
-    ("Hooli Fictional", "LLM Agent Developer", "agent", 79, "media", "2000", "USD", 2000, True, "Third-party portal", "si", "EN", "Remote, worldwide"),
-    ("Stark Imaginary Ltd", "Data Engineer", "data", 74, "media", "", "", None, False, "Third-party portal", "si", "EN", "Remote, EMEA and LATAM"),
-    ("Wayne Mockup Inc", "Full Stack Developer", "sw", 71, "media", "1100", "USD", 1100, True, "Company careers form", "si", "EN", "Remote, LATAM"),
+    ("Acme Example", "Junior AI Automation Engineer", "agent", 92, "alta", "1800-2400", "USD", 2100, True, "Email with CV attached", "no", "EN", "Remote, LATAM"),
+    ("Globex Sample Co", "Data Analyst (Entry level)", "data", 88, "alta", "1500", "USD", 1500, True, "Company careers form", "si", "EN", "Remote, worldwide"),
+    ("Initech Demo", "Backend Developer (Python), Junior", "sw", 84, "alta", "", "", None, False, "Company careers form", "si", "EN", "Remote, LATAM"),
+    ("Umbrella Placeholder", "Junior BI Developer", "bi", 81, "media", "1300-1600", "USD", 1450, True, "Email with CV attached", "no", "ES", "Remote, Americas"),
+    ("Hooli Fictional", "Junior LLM Agent Developer", "agent", 79, "media", "2000", "USD", 2000, True, "Third-party portal", "si", "EN", "Remote, worldwide"),
+    ("Stark Imaginary Ltd", "Junior Data Engineer", "data", 74, "media", "", "", None, False, "Third-party portal", "si", "EN", "Remote, EMEA and LATAM"),
+    ("Wayne Mockup Inc", "Junior Full Stack Developer", "sw", 71, "media", "1100", "USD", 1100, True, "Company careers form", "si", "EN", "Remote, LATAM"),
     ("Soylent Test Labs", "Automation Specialist (no-code and scripts)", "agent", 66, "baja", "900-1000", "USD", 950, False, "Email with CV attached", "no", "EN", "Remote, worldwide"),
     ("Cyberdyne Notreal", "Junior Software Engineer", "sw", 58, "baja", "", "", None, False, "Company careers form", "si", "EN", "Hybrid, outside eligible area"),
-    ("Vandelay Example Group", "Analytics Engineer", "data", 77, "media", "1700", "USD", 1700, True, "Company careers form", "si", "EN", "Remote, Americas"),
-    ("Pied Piper Sample", "Workflow Automation Developer", "agent", 86, "alta", "1600-2000", "USD", 1800, True, "Email with CV attached", "no", "ES", "Remote, LATAM"),
+    ("Vandelay Example Group", "Junior Analytics Engineer", "data", 77, "media", "1700", "USD", 1700, True, "Company careers form", "si", "EN", "Remote, Americas"),
+    ("Pied Piper Sample", "Prompt and Workflow Automation Developer (Jr.)", "agent", 86, "alta", "1600-2000", "USD", 1800, True, "Email with CV attached", "no", "ES", "Remote, LATAM"),
 ]
 S = {
     "agent": ("Hands-on experience building automation pipelines and LLM tool-use flows.", "Limited exposure to the vendor's own orchestration product.", "Fast-growing team; scope may shift."),
