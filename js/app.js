@@ -5,13 +5,33 @@
   var STORE_KEY = 'jrb.decisions.v1';
   var LABEL = { pending: 'To review', approved: 'Approved', hold: 'On hold', discarded: 'Discarded' };
   var PRIO = { alta: 'High', media: 'Medium', baja: 'Low' };
-  var state = { jobs: [], decisions: load(), status: 'pending', prio: 'todas', soloSalario: false, maxDias: 0, orden: 'score', open: null, confirm: null, ready: false, error: '', source: '' };
+  var state = { jobs: [], decisions: load(), status: 'pending', prio: 'todas', soloSalario: false, maxDias: 0, orden: 'score', open: null, confirm: null, ready: false, error: '', source: '', sync: false };
 
   function load() {
     try { return L.parseDecisions(JSON.parse(localStorage.getItem(STORE_KEY))) || {}; } catch (e) { return {}; }
   }
   function save() {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify({ version: 1, decisions: state.decisions })); return true; } catch (e) { return false; }
+    var ok = true;
+    try { localStorage.setItem(STORE_KEY, JSON.stringify({ version: 1, decisions: state.decisions })); } catch (e) { ok = false; }
+    syncPush();
+    return ok;
+  }
+  /* When served by scripts/board_server.py (127.0.0.1) every change is also written to data/decisions.json on disk. */
+  function syncPush() {
+    if (!state.sync) return;
+    fetch('/api/decisions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ version: 1, decisions: state.decisions }) })
+      .then(function (r) { if (!r.ok) throw new Error(String(r.status)); say('Saved to disk (data/decisions.json).'); })
+      .catch(function () { say('Could not save to disk. Is board_server.py still running?'); });
+  }
+  function initDisk() {
+    if (!/^(127\.0\.0\.1|localhost)$/.test(location.hostname)) return Promise.resolve();
+    return fetchJson('/api/decisions').then(function (d) {
+      state.sync = true;
+      var dec = L.parseDecisions(d) || {};
+      if (!Object.keys(dec).length && Object.keys(state.decisions).length) syncPush();
+      else { state.decisions = dec; try { localStorage.setItem(STORE_KEY, JSON.stringify({ version: 1, decisions: dec })); } catch (e) {} }
+      state.source += ' | decisions saved to disk';
+    }).catch(function () {});
   }
 
   function h(tag, attrs) {
@@ -210,5 +230,5 @@
   }).catch(function () {
     state.ready = true;
     state.error = 'Could not fetch data files (opening index.html directly blocks this in some browsers). Use "Load jobs file", or run python -m http.server.';
-  }).then(render);
+  }).then(initDisk).then(render);
 })();
